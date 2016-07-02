@@ -22,6 +22,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
 
     //item table
     private static final String ITEM_TABLE = "item";
+    private static final String COLUMN_KEY = "item_key";//relate to the page
     private static final String COLUMN_ITEM_ID = "item_id";
     private static final String COLUMN_PRICE = "price";
     private static final String COLUMN_SOLD = "sold";
@@ -52,9 +53,10 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     private static final String ITEM_CREATE = "CREATE TABLE "
             +ITEM_TABLE
             +" ("
-            +COLUMN_ITEM_ID +" text primary key,"
+            +COLUMN_KEY + " integer primary key autoincrement,"
+            +COLUMN_ITEM_ID +" text not null,"
             +COLUMN_PRICE +" integer not null,"
-            +COLUMN_SOLD +"integer"
+            +COLUMN_SOLD +" integer not null"
             +");";
 
     private static final String PIC_CREATE = "CREATE TABLE "
@@ -219,15 +221,15 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     }
 
    //get a set of data from database
-    public FashionAdapter getValue(String Item_id){
+    public FashionAdapter getValue(int Item_key){
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor item = db.query(ITEM_TABLE, new String[]{
                 COLUMN_ITEM_ID,
                 COLUMN_PRICE,
                 COLUMN_SOLD
-        }, COLUMN_ITEM_ID + "=?", new String[]{
-                Item_id
+        }, COLUMN_KEY + "=?", new String[]{
+                Integer.toString(Item_key)
         }, null, null, null, null);
 
         ItemAdapter ia = null;
@@ -244,7 +246,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
                 PIC_ID,
                 PIC_ITEM,
                 PIC_PATH}, PIC_ITEM+"=?",new String[]{
-                Item_id
+                ia.getItem_id()
         },null,null,null,null);
 
         List<PicAdapter> pa_list = new ArrayList<PicAdapter>();
@@ -264,7 +266,7 @@ public class DatabaseHandler extends SQLiteOpenHelper{
                 SHOP_ITEM,
                 SHOP_ID,
                 SHOP_SIZE}, SHOP_ITEM+"=?", new String[]{
-                Item_id
+                ia.getItem_id()
         },null,null,null,null);
 
         List<ShopAdapter> sa_list = new ArrayList<ShopAdapter>();
@@ -413,18 +415,53 @@ public class DatabaseHandler extends SQLiteOpenHelper{
     public List<Integer> getShopSize(String itemId,String shopId){
         List<Integer> size_list = new ArrayList<Integer>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor size = db.query(SHOP_TABLE,new String[]{
+        Cursor size = db.query(SHOP_TABLE, new String[]{
                 SHOP_AVAIBALBE,
                 SHOP_ITEM,
                 SHOP_ID,
                 SHOP_SIZE
-        },SHOP_ITEM+"=? AND "+SHOP_ID+"=?",new String[]{itemId,shopId},null,null,null,null );
+        }, SHOP_ITEM + "=? AND " + SHOP_ID + "=?", new String[]{itemId, shopId}, null, null, null, null);
         if (size.moveToFirst()){
             do{
                 size_list.add(size.getInt(3));
             }while(size.moveToNext());
         }
         size.close();
+        db.close();
+        return size_list;
+    }
+    //get different shop id
+    List<String> getShopNum(String item_id){
+        List<String> shop_num = new ArrayList<String>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(SHOP_TABLE, new String[]{
+                SHOP_ID
+        },SHOP_ITEM+"=?",new String[]{item_id},null,null,null,null);
+
+        if (cursor.moveToFirst()){
+            do{
+                shop_num.add(cursor.getString(0));
+            }while(cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return shop_num;
+    }
+
+    //get different size of same shop
+    public List<Integer> getShop_Size(String item_id,String shop_id){
+        List<Integer> size_list = new ArrayList<Integer>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(SHOP_TABLE,new String[]{
+                SHOP_SIZE
+        },SHOP_ITEM+"=? AND "+SHOP_ID+"=?",new String[]{item_id,shop_id},null,null,null,null);
+
+        if (cursor.moveToFirst()){
+            do{
+                size_list.add(cursor.getInt(0));
+            }while(cursor.moveToNext());
+        }
+        cursor.close();
         db.close();
         return size_list;
     }

@@ -10,6 +10,7 @@ public class PicAdapter {
         this.Pic_item = pic_item;
         this.Path = path;
     }
+    public PicAdapter(){}
 
     public String getPath() {
         return Path;

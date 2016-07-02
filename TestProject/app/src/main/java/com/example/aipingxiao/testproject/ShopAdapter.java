@@ -12,6 +12,7 @@ public class ShopAdapter {
         this.Shop_id = shop_id;
         this.Size = shop_size;
     }
+    public  ShopAdapter(){}
 
     public String getShop_available() {
         return Shop_available;

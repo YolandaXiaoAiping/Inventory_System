@@ -23,7 +23,7 @@ public class JsonParser {
     static JSONObject jObj = null;
     static String json = "";
 
-    public JSONObject getJSONFromUrl(String url){
+    public String getJSONFromUrl(String url){
 
         //make HTTP request
         try{
@@ -62,6 +62,7 @@ public class JsonParser {
         }
 
         //return JSON String
-        return jObj;
+        //return jObj;
+        return json;
     }
 }

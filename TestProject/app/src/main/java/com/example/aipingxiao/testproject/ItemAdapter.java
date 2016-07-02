@@ -11,6 +11,8 @@ public class ItemAdapter {
         this.sold = sold;
     }
 
+    public ItemAdapter(){}
+
     public String getItem_id() {
         return Item_id;
     }
